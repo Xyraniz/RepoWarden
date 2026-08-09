@@ -10,6 +10,12 @@ def _language_rows(report: RepositoryReport) -> str:
     return "\n".join(f"| {name} | {count} |" for name, count in report.languages.items())
 
 
+def _recommendations(report: RepositoryReport) -> str:
+    if not report.recommendations:
+        return "Todo en orden: no se detectaron recomendaciones básicas."
+    return "\n".join(f"- {item}" for item in report.recommendations)
+
+
 def render_markdown(report: RepositoryReport) -> str:
     status = report.git_status or "No es un repositorio Git"
     languages = ", ".join(report.languages) if report.languages else "No detectados"
@@ -19,6 +25,12 @@ def render_markdown(report: RepositoryReport) -> str:
     return f"""# Informe de RepoWarden: {report.name}
 
 > Informe generado automáticamente para inspeccionar la salud y composición de un repositorio local.
+
+## Puntuación de salud
+
+**{report.health_score}/100**
+
+La puntuación considera Git, documentación, licencia, pruebas e integración continua.
 
 ## Resumen
 
@@ -33,6 +45,10 @@ def render_markdown(report: RepositoryReport) -> str:
 | Licencia | {'Sí' if report.has_license else 'No'} |
 | Pruebas | {'Sí' if report.has_tests else 'No'} |
 | CI configurada | {'Sí' if report.has_ci else 'No'} |
+
+## Recomendaciones
+
+{_recommendations(report)}
 
 ## Lenguajes detectados
 
